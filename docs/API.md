@@ -253,10 +253,9 @@ const project = await client.projects.create({
   color: "#FF0000", // Optional
   parent: "/projects/123", // Optional
   notes: "Project notes", // Optional
-  rate: 100, // Optional
-  custom_fields: {
+  customFields: {
     // Optional
-    client_id: "456",
+    clientId: "456",
     department: "Engineering",
   },
 });
@@ -264,14 +263,14 @@ const project = await client.projects.create({
 
 #### Parameters
 
-| Name          | Type   | Required | Description                    |
-| ------------- | ------ | -------- | ------------------------------ |
-| title         | string | Yes      | Project title                  |
-| color         | string | No       | Hex color code for the project |
-| parent        | string | No       | Reference to a parent project  |
-| notes         | string | No       | Project notes                  |
-| rate          | number | No       | Project billing rate           |
-| custom_fields | object | No       | Custom fields for the project  |
+| Name         | Type   | Required | Description                    |
+| ------------ | ------ | -------- | ------------------------------ |
+| title        | string | Yes      | Project title                  |
+| color        | string | No       | Hex color code for the project |
+| parent       | string | No       | Reference to a parent project  |
+| notes        | string | No       | Project notes                  |
+| rate         | number | No       | Project billing rate           |
+| customFields | object | No       | Custom fields for the project  |
 
 #### Returns
 

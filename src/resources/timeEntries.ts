@@ -1,6 +1,7 @@
 import { AxiosInstance } from "axios";
 import { TimeEntry } from "../types/timeEntry";
 import { ApiResponse } from "../types/apiResponse";
+import { toSnakeCase } from "../utils/toSnakeCase";
 
 export interface StartTimerOptions {
   /**
@@ -30,6 +31,11 @@ export interface StartTimerOptions {
    * will be adjusted or deleted altogether. Defaults to false.
    */
   replaceExisting?: boolean;
+
+  /**
+   * Custom fields
+   */
+  customFields?: Record<string, string>;
 }
 
 export interface CreateTimeEntryOptions {
@@ -65,13 +71,54 @@ export interface CreateTimeEntryOptions {
    * will be adjusted or deleted altogether. Defaults to false.
    */
   replaceExisting?: boolean;
+
+  /**
+   * Custom fields
+   */
+  customFields?: Record<string, string>;
+}
+
+export interface ListTimeEntriesQuery {
+  /**
+   * Start date for filtering time entries
+   */
+  startDateMin?: string;
+  /**
+   * End date for filtering time entries
+   */
+  startDateMax?: string;
+
+  /**
+   * Project reference e.g.: '/projects/1'
+   */
+  projects?: string[];
+
+  /**
+   * Include child projects in the search
+   */
+  includeChildProjects?: boolean;
+
+  /**
+   * Search query for filtering time entries
+   */
+  searchQuery?: string;
+
+  /**
+   * Return only time entries that are currently running or not
+   */
+  isRunning?: boolean;
+
+  /**
+   * Include project data in the response
+   */
+  includeProjectData: boolean;
 }
 
 /**
  * API resource for time entries
  */
 export class TimeEntriesResource {
-  constructor(private readonly axios: AxiosInstance) {}
+  constructor(private readonly axios: AxiosInstance) { }
 
   /**
    * Start a timer
@@ -81,7 +128,7 @@ export class TimeEntriesResource {
   public async start(options: StartTimerOptions): Promise<TimeEntry> {
     const response = await this.axios.post<ApiResponse<TimeEntry>>(
       "/time-entries/start",
-      options,
+      toSnakeCase(options),
     );
     return response.data.data;
   }
@@ -106,7 +153,7 @@ export class TimeEntriesResource {
   public async create(options: CreateTimeEntryOptions): Promise<TimeEntry> {
     const response = await this.axios.post<ApiResponse<TimeEntry>>(
       "/time-entries",
-      options,
+      toSnakeCase(options),
     );
     return response.data.data;
   }
@@ -120,7 +167,7 @@ export class TimeEntriesResource {
     const response = await this.axios.get<ApiResponse<TimeEntry[]>>(
       "/time-entries",
       {
-        params: query,
+        params: query ? toSnakeCase(query) : undefined,
       },
     );
     return response.data.data;
@@ -150,7 +197,7 @@ export class TimeEntriesResource {
   ): Promise<TimeEntry> {
     const response = await this.axios.put<ApiResponse<TimeEntry>>(
       `/time-entries/${id}`,
-      data,
+      toSnakeCase(data),
     );
     return response.data.data;
   }

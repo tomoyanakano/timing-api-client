@@ -2,6 +2,7 @@ import { AxiosInstance } from "axios";
 import { Project } from "../types/project";
 import { ApiResponse } from "../types/apiResponse";
 import { TimeEntry } from "../types/timeEntry";
+import { toSnakeCase } from "../utils/toSnakeCase";
 
 export interface CreateProjectOptions {
   /**
@@ -27,30 +28,43 @@ export interface CreateProjectOptions {
   notes?: string;
 
   /**
-   * Project billing rate
+   * Project productivity score
+   * Example: 0.8
    */
-  rate?: number;
+  productivityScore?: number;
 
   /**
    * Custom fields
    */
-  custom_fields?: Record<string, string>;
+  customFields?: Record<string, string>;
+}
+
+export interface ListProjectsQuery {
+  /**
+   * Filter by project title
+   */
+  title?: string;
+
+  /**
+   * Hide archived projects
+   */
+  hideArchived?: boolean;
 }
 
 /**
  * API resource for projects
  */
 export class ProjectsResource {
-  constructor(private readonly axios: AxiosInstance) {}
+  constructor(private readonly axios: AxiosInstance) { }
 
   /**
    * Get a list of projects
    * @param query Query parameters
    * @returns List of projects
    */
-  public async list(query?: Record<string, any>): Promise<Project[]> {
+  public async list(query?: ListProjectsQuery): Promise<Project[]> {
     const response = await this.axios.get<ApiResponse<Project[]>>("/projects", {
-      params: query,
+      params: query ? toSnakeCase(query) : undefined,
     });
     return response.data.data;
   }
@@ -75,7 +89,7 @@ export class ProjectsResource {
   public async create(options: CreateProjectOptions): Promise<Project> {
     const response = await this.axios.post<ApiResponse<Project>>(
       "/projects",
-      options,
+      toSnakeCase(options),
     );
     return response.data.data;
   }
@@ -92,7 +106,7 @@ export class ProjectsResource {
   ): Promise<Project> {
     const response = await this.axios.put<ApiResponse<Project>>(
       `/projects/${id}`,
-      data,
+      toSnakeCase(data),
     );
     return response.data.data;
   }
