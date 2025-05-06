@@ -1,5 +1,6 @@
 import { AxiosInstance } from "axios";
 import { TimeEntry } from "../types/timeEntry";
+import { ApiResponse } from "../types/apiResponse";
 
 export interface StartTimerOptions {
   /**
@@ -70,7 +71,7 @@ export interface CreateTimeEntryOptions {
  * API resource for time entries
  */
 export class TimeEntriesResource {
-  constructor(private readonly axios: AxiosInstance) { }
+  constructor(private readonly axios: AxiosInstance) {}
 
   /**
    * Start a timer
@@ -78,11 +79,11 @@ export class TimeEntriesResource {
    * @returns Created time entry
    */
   public async start(options: StartTimerOptions): Promise<TimeEntry> {
-    const response = await this.axios.post<TimeEntry>(
+    const response = await this.axios.post<ApiResponse<TimeEntry>>(
       "/time-entries/start",
       options,
     );
-    return response.data;
+    return response.data.data;
   }
 
   /**
@@ -90,8 +91,11 @@ export class TimeEntriesResource {
    * @returns Stopped time entry
    */
   public async stop(): Promise<TimeEntry> {
-    const response = await this.axios.put<TimeEntry>("/time-entries/stop", {});
-    return response.data;
+    const response = await this.axios.put<ApiResponse<TimeEntry>>(
+      "/time-entries/stop",
+      {},
+    );
+    return response.data.data;
   }
 
   /**
@@ -100,8 +104,11 @@ export class TimeEntriesResource {
    * @returns Created time entry
    */
   public async create(options: CreateTimeEntryOptions): Promise<TimeEntry> {
-    const response = await this.axios.post<TimeEntry>("/time-entries", options);
-    return response.data;
+    const response = await this.axios.post<ApiResponse<TimeEntry>>(
+      "/time-entries",
+      options,
+    );
+    return response.data.data;
   }
 
   /**
@@ -110,10 +117,13 @@ export class TimeEntriesResource {
    * @returns List of time entries
    */
   public async list(query?: Record<string, any>): Promise<TimeEntry[]> {
-    const response = await this.axios.get<TimeEntry[]>("/time-entries", {
-      params: query,
-    });
-    return response.data;
+    const response = await this.axios.get<ApiResponse<TimeEntry[]>>(
+      "/time-entries",
+      {
+        params: query,
+      },
+    );
+    return response.data.data;
   }
 
   /**
@@ -122,8 +132,10 @@ export class TimeEntriesResource {
    * @returns Time entry
    */
   public async get(id: string): Promise<TimeEntry> {
-    const response = await this.axios.get<TimeEntry>(`/time-entries/${id}`);
-    return response.data;
+    const response = await this.axios.get<ApiResponse<TimeEntry>>(
+      `/time-entries/${id}`,
+    );
+    return response.data.data;
   }
 
   /**
@@ -136,11 +148,11 @@ export class TimeEntriesResource {
     id: string,
     data: Partial<TimeEntry>,
   ): Promise<TimeEntry> {
-    const response = await this.axios.put<TimeEntry>(
+    const response = await this.axios.put<ApiResponse<TimeEntry>>(
       `/time-entries/${id}`,
       data,
     );
-    return response.data;
+    return response.data.data;
   }
 
   /**

@@ -1,5 +1,7 @@
 import { AxiosInstance } from "axios";
 import { Project } from "../types/project";
+import { ApiResponse } from "../types/apiResponse";
+import { TimeEntry } from "../types/timeEntry";
 
 export interface CreateProjectOptions {
   /**
@@ -39,7 +41,7 @@ export interface CreateProjectOptions {
  * API resource for projects
  */
 export class ProjectsResource {
-  constructor(private readonly axios: AxiosInstance) { }
+  constructor(private readonly axios: AxiosInstance) {}
 
   /**
    * Get a list of projects
@@ -47,10 +49,10 @@ export class ProjectsResource {
    * @returns List of projects
    */
   public async list(query?: Record<string, any>): Promise<Project[]> {
-    const response = await this.axios.get<Project[]>("/projects", {
+    const response = await this.axios.get<ApiResponse<Project[]>>("/projects", {
       params: query,
     });
-    return response.data;
+    return response.data.data;
   }
 
   /**
@@ -59,8 +61,10 @@ export class ProjectsResource {
    * @returns Project
    */
   public async get(id: string): Promise<Project> {
-    const response = await this.axios.get<Project>(`/projects/${id}`);
-    return response.data;
+    const response = await this.axios.get<ApiResponse<Project>>(
+      `/projects/${id}`,
+    );
+    return response.data.data;
   }
 
   /**
@@ -69,8 +73,11 @@ export class ProjectsResource {
    * @returns Created project
    */
   public async create(options: CreateProjectOptions): Promise<Project> {
-    const response = await this.axios.post<Project>("/projects", options);
-    return response.data;
+    const response = await this.axios.post<ApiResponse<Project>>(
+      "/projects",
+      options,
+    );
+    return response.data.data;
   }
 
   /**
@@ -83,8 +90,11 @@ export class ProjectsResource {
     id: string,
     data: Partial<CreateProjectOptions>,
   ): Promise<Project> {
-    const response = await this.axios.put<Project>(`/projects/${id}`, data);
-    return response.data;
+    const response = await this.axios.put<ApiResponse<Project>>(
+      `/projects/${id}`,
+      data,
+    );
+    return response.data.data;
   }
 
   /**
@@ -94,21 +104,5 @@ export class ProjectsResource {
    */
   public async delete(id: string): Promise<void> {
     await this.axios.delete(`/projects/${id}`);
-  }
-
-  /**
-   * Get time entries for a project
-   * @param id Project ID
-   * @param query Query parameters
-   * @returns List of time entries for the project
-   */
-  public async getTimeEntries(
-    id: string,
-    query?: Record<string, any>,
-  ): Promise<any[]> {
-    const response = await this.axios.get(`/projects/${id}/time-entries`, {
-      params: query,
-    });
-    return response.data;
   }
 }
