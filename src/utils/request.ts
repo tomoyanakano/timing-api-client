@@ -56,11 +56,6 @@ export class ApiError extends Error {
     this.code = details.code;
     this.originalError = details.originalError;
 
-    // Add part of the error message to the error stack
-    if (details.originalError.response?.data) {
-      this.message = `${this.message}: ${details.originalError.response.data}`;
-    }
-
     // Restore prototype chain (for TypeScript class inheritance)
     Object.setPrototypeOf(this, ApiError.prototype);
   }
