@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import { TimingClient } from "../src/client";
-import { ApiError } from "../src/utils/request";
 
 // Mock axios
 jest.mock("axios");
