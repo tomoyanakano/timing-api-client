@@ -79,7 +79,7 @@ export class TimingClient {
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const statusCode = error.response?.status;
+        const statusCode = error.response?.status || 500;
         const errorMessage = error.response?.data?.error || error.message;
 
         throw {
