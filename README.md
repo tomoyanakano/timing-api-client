@@ -6,6 +6,9 @@ A Node.js client library for interacting with the [Timing](https://timingapp.com
 
 This library provides convenient methods for managing projects and time entries through the Timing API.
 
+> [!warning]
+> This library is not officially supported by Timing. It is a community-driven project and may not cover all API features or be up-to-date with the latest API changes.
+
 ## Features
 
 - Easy initialization with your API key.
