@@ -42,28 +42,32 @@ describe("TimeEntriesResource", () => {
         title: "Test Timer",
         notes: "Test Notes",
       };
-
-      const mockResponse = {
-        data: {
-          self: "/time-entries/456",
-          project: "/projects/123",
-          title: "Test Timer",
-          notes: "Test Notes",
-          start_date: "2023-01-01T10:00:00+00:00",
-          end_date: null,
-          is_running: true,
-        },
+      const expectedTimeEntry: TimeEntry = {
+        self: "/time-entries/456",
+        project: { self: "/projects/123" }, // Assuming project is returned as an object reference
+        title: "Test Timer",
+        notes: "Test Notes",
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: null,
+        is_running: true,
+        duration: 0, // Add missing properties from TimeEntry type if necessary
+        creator_name: "Test User",
+        custom_fields: {},
       };
 
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
+      mockedAxios.post.mockResolvedValueOnce({ data: { data: expectedTimeEntry } });
 
       const result = await timeEntries.start(options);
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
         "/time-entries/start",
-        options,
+        { // Expect snake_case payload
+          project: "/projects/123",
+          title: "Test Timer",
+          notes: "Test Notes",
+        },
       );
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(expectedTimeEntry);
     });
 
     test("should handle optional parameters", async () => {
@@ -72,31 +76,37 @@ describe("TimeEntriesResource", () => {
         project: "/projects/123",
         title: "Test Timer",
         notes: "Test Notes",
-        startDate: now,
-        replaceExisting: true,
+        startDate: now, // camelCase input
+        replaceExisting: true, // camelCase input
+      };
+      const expectedTimeEntry: TimeEntry = {
+        self: "/time-entries/456",
+        project: { self: "/projects/123" },
+        title: "Test Timer",
+        notes: "Test Notes",
+        start_date: now,
+        end_date: null,
+        is_running: true,
+        duration: 0,
+        creator_name: "Test User",
+        custom_fields: {},
       };
 
-      const mockResponse = {
-        data: {
-          self: "/time-entries/456",
-          project: "/projects/123",
-          title: "Test Timer",
-          notes: "Test Notes",
-          start_date: now,
-          end_date: null,
-          is_running: true,
-        },
-      };
-
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
+      mockedAxios.post.mockResolvedValueOnce({ data: { data: expectedTimeEntry } });
 
       const result = await timeEntries.start(options);
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
         "/time-entries/start",
-        options,
+        { // Expect snake_case payload
+          project: "/projects/123",
+          title: "Test Timer",
+          notes: "Test Notes",
+          start_date: now,
+          replace_existing: true,
+        },
       );
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(expectedTimeEntry);
     });
 
     test("should handle API errors", async () => {
@@ -114,24 +124,25 @@ describe("TimeEntriesResource", () => {
 
   describe("stop", () => {
     test("should stop the current timer", async () => {
-      const mockResponse = {
-        data: {
-          self: "/time-entries/456",
-          project: "/projects/123",
-          title: "Test Timer",
-          notes: "Test Notes",
-          start_date: "2023-01-01T10:00:00+00:00",
-          end_date: "2023-01-01T12:00:00+00:00",
-          is_running: false,
-        },
+      const expectedTimeEntry: TimeEntry = {
+        self: "/time-entries/456",
+        project: { self: "/projects/123" },
+        title: "Test Timer",
+        notes: "Test Notes",
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: "2023-01-01T12:00:00+00:00",
+        is_running: false,
+        duration: 7200, // Example duration
+        creator_name: "Test User",
+        custom_fields: {},
       };
 
-      mockedAxios.put.mockResolvedValueOnce(mockResponse);
+      mockedAxios.put.mockResolvedValueOnce({ data: { data: expectedTimeEntry } });
 
       const result = await timeEntries.stop();
 
       expect(mockedAxios.put).toHaveBeenCalledWith("/time-entries/stop", {});
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(expectedTimeEntry);
     });
 
     test("should handle error when no timer is running", async () => {
@@ -155,136 +166,149 @@ describe("TimeEntriesResource", () => {
         title: "Test Entry",
         notes: "Test Notes",
       };
-
-      const mockResponse = {
-        data: {
-          self: "/time-entries/789",
-          project: "/projects/123",
-          title: "Test Entry",
-          notes: "Test Notes",
-          start_date: "2023-01-01T10:00:00+00:00",
-          end_date: "2023-01-01T12:00:00+00:00",
-          is_running: false,
-        },
+      const expectedTimeEntry: TimeEntry = {
+        self: "/time-entries/789",
+        project: { self: "/projects/123" },
+        title: "Test Entry",
+        notes: "Test Notes",
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: "2023-01-01T12:00:00+00:00",
+        is_running: false,
+        duration: 7200,
+        creator_name: "Test User",
+        custom_fields: {},
       };
 
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
+      mockedAxios.post.mockResolvedValueOnce({ data: { data: expectedTimeEntry } });
 
       const result = await timeEntries.create(options);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith("/time-entries", options);
-      expect(result).toEqual(mockResponse.data);
+      expect(mockedAxios.post).toHaveBeenCalledWith("/time-entries", { // Expect snake_case
+        project: "/projects/123",
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: "2023-01-01T12:00:00+00:00",
+        title: "Test Entry",
+        notes: "Test Notes",
+      });
+      expect(result).toEqual(expectedTimeEntry);
     });
 
     test("should handle overlapping entries with replaceExisting=true", async () => {
       const options = {
         project: "/projects/123",
-        startDate: "2023-01-01T10:00:00+00:00",
-        endDate: "2023-01-01T12:00:00+00:00",
-        replaceExisting: true,
+        startDate: "2023-01-01T10:00:00+00:00", // camelCase
+        endDate: "2023-01-01T12:00:00+00:00", // camelCase
+        replaceExisting: true, // camelCase
+      };
+      const expectedTimeEntry: TimeEntry = {
+        self: "/time-entries/789",
+        project: { self: "/projects/123" },
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: "2023-01-01T12:00:00+00:00",
+        is_running: false,
+        duration: 7200,
+        creator_name: "Test User",
+        custom_fields: {},
+        title: undefined, // Ensure all required fields are present or explicitly undefined
+        notes: undefined,
       };
 
-      const mockResponse = {
-        data: {
-          self: "/time-entries/789",
-          project: "/projects/123",
-          start_date: "2023-01-01T10:00:00+00:00",
-          end_date: "2023-01-01T12:00:00+00:00",
-          is_running: false,
-        },
-      };
-
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
+      mockedAxios.post.mockResolvedValueOnce({ data: { data: expectedTimeEntry } });
 
       const result = await timeEntries.create(options);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith("/time-entries", options);
-      expect(result).toEqual(mockResponse.data);
+      expect(mockedAxios.post).toHaveBeenCalledWith("/time-entries", { // Expect snake_case
+        project: "/projects/123",
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: "2023-01-01T12:00:00+00:00",
+        replace_existing: true,
+      });
+      expect(result).toEqual(expectedTimeEntry);
     });
   });
 
   describe("list", () => {
     test("should get a list of time entries", async () => {
-      const mockResponse = {
-        data: [
-          {
-            self: "/time-entries/123",
-            project: "/projects/456",
-            title: "Entry 1",
-            start_date: "2023-01-01T10:00:00+00:00",
-            end_date: "2023-01-01T12:00:00+00:00",
-          },
-          {
-            self: "/time-entries/124",
-            project: "/projects/456",
-            title: "Entry 2",
-            start_date: "2023-01-02T10:00:00+00:00",
-            end_date: "2023-01-02T12:00:00+00:00",
-          },
-        ],
-      };
+      const expectedTimeEntries: TimeEntry[] = [
+        {
+          self: "/time-entries/123",
+          project: { self: "/projects/456" },
+          title: "Entry 1",
+          start_date: "2023-01-01T10:00:00+00:00",
+          end_date: "2023-01-01T12:00:00+00:00",
+          is_running: false, duration: 7200, creator_name: "TU", custom_fields: {}
+        },
+        {
+          self: "/time-entries/124",
+          project: { self: "/projects/456" },
+          title: "Entry 2",
+          start_date: "2023-01-02T10:00:00+00:00",
+          end_date: "2023-01-02T12:00:00+00:00",
+          is_running: false, duration: 7200, creator_name: "TU", custom_fields: {}
+        },
+      ];
 
-      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+      mockedAxios.get.mockResolvedValueOnce({ data: { data: expectedTimeEntries } });
 
       const result = await timeEntries.list();
 
       expect(mockedAxios.get).toHaveBeenCalledWith("/time-entries", {
         params: undefined,
       });
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(expectedTimeEntries);
       expect(result.length).toBe(2);
     });
 
     test("should get filtered time entries", async () => {
-      const query = {
-        from: "2023-01-01",
-        to: "2023-01-31",
-        project: "/projects/456",
+      const query = { // These are camelCase, will be converted by toSnakeCase
+        startDateMin: "2023-01-01",
+        startDateMax: "2023-01-31",
+        projects: ["/projects/456"],
       };
+      const expectedTimeEntries: TimeEntry[] = [
+        {
+          self: "/time-entries/123",
+          project: { self: "/projects/456" },
+          title: "Entry 1",
+          start_date: "2023-01-01T10:00:00+00:00",
+          end_date: "2023-01-01T12:00:00+00:00",
+          is_running: false, duration: 7200, creator_name: "TU", custom_fields: {}
+        },
+      ];
 
-      const mockResponse = {
-        data: [
-          {
-            self: "/time-entries/123",
-            project: "/projects/456",
-            title: "Entry 1",
-            start_date: "2023-01-01T10:00:00+00:00",
-            end_date: "2023-01-01T12:00:00+00:00",
-          },
-        ],
-      };
-
-      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+      mockedAxios.get.mockResolvedValueOnce({ data: { data: expectedTimeEntries } });
 
       const result = await timeEntries.list(query);
 
       expect(mockedAxios.get).toHaveBeenCalledWith("/time-entries", {
-        params: query,
+        params: { // Expect snake_case params
+            start_date_min: "2023-01-01",
+            start_date_max: "2023-01-31",
+            projects: ["/projects/456"],
+        },
       });
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(expectedTimeEntries);
     });
   });
 
   describe("get", () => {
     test("should get a specific time entry", async () => {
       const id = "123";
-
-      const mockResponse = {
-        data: {
-          self: "/time-entries/123",
-          project: "/projects/456",
-          title: "Entry 1",
-          start_date: "2023-01-01T10:00:00+00:00",
-          end_date: "2023-01-01T12:00:00+00:00",
-        },
+      const expectedTimeEntry: TimeEntry = {
+        self: "/time-entries/123",
+        project: { self: "/projects/456" },
+        title: "Entry 1",
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: "2023-01-01T12:00:00+00:00",
+        is_running: false, duration: 7200, creator_name: "TU", custom_fields: {}
       };
 
-      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+      mockedAxios.get.mockResolvedValueOnce({ data: { data: expectedTimeEntry } });
 
       const result = await timeEntries.get(id);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(`/time-entries/${id}`);
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(expectedTimeEntry);
     });
 
     test("should handle non-existent time entry", async () => {
@@ -302,27 +326,28 @@ describe("TimeEntriesResource", () => {
     test("should update a time entry", async () => {
       const id = "123";
       const data = {
+        title: "Updated Title", // camelCase
+        notes: "Updated Notes", // camelCase
+      };
+      const expectedTimeEntry: TimeEntry = {
+        self: "/time-entries/123",
+        project: { self: "/projects/456" },
         title: "Updated Title",
         notes: "Updated Notes",
+        start_date: "2023-01-01T10:00:00+00:00",
+        end_date: "2023-01-01T12:00:00+00:00",
+        is_running: false, duration: 7200, creator_name: "TU", custom_fields: {}
       };
 
-      const mockResponse = {
-        data: {
-          self: "/time-entries/123",
-          project: "/projects/456",
-          title: "Updated Title",
-          notes: "Updated Notes",
-          start_date: "2023-01-01T10:00:00+00:00",
-          end_date: "2023-01-01T12:00:00+00:00",
-        },
-      };
-
-      mockedAxios.put.mockResolvedValueOnce(mockResponse);
+      mockedAxios.put.mockResolvedValueOnce({ data: { data: expectedTimeEntry } });
 
       const result = await timeEntries.update(id, data);
 
-      expect(mockedAxios.put).toHaveBeenCalledWith(`/time-entries/${id}`, data);
-      expect(result).toEqual(mockResponse.data);
+      expect(mockedAxios.put).toHaveBeenCalledWith(`/time-entries/${id}`, { // Expect snake_case
+        title: "Updated Title",
+        notes: "Updated Notes",
+      });
+      expect(result).toEqual(expectedTimeEntry);
     });
   });
 
