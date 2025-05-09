@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { TimeEntriesResource } from "./resources/timeEntries";
 import { ProjectsResource } from "./resources/projects";
+import { ReportsResource } from "./resources/reports";
 
 export interface TimingClientOptions {
   /**
@@ -38,6 +39,11 @@ export class TimingClient {
   public readonly projects: ProjectsResource;
 
   /**
+   * API resources for reports
+   */
+  public readonly reports: ReportsResource;
+
+  /**
    * Create a Timing API client
    * @param options Client options
    */
@@ -66,6 +72,7 @@ export class TimingClient {
     // Initialize resources
     this.timeEntries = new TimeEntriesResource(this.axiosInstance);
     this.projects = new ProjectsResource(this.axiosInstance);
+    this.reports = new ReportsResource(this.axiosInstance);
   }
 
   /**
