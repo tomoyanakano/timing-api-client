@@ -1,15 +1,12 @@
-import { AxiosInstance } from 'axios';
-import { ApiResponse } from '../types/apiResponse';
-import { ReportRow, GenerateReportQuery } from '../types/report';
-import { toSnakeCase } from '../utils/toSnakeCase';
+import { AxiosInstance } from "axios";
+import { ApiResponse } from "../types/apiResponse";
+import { ReportRow, GenerateReportQuery } from "../types/report";
+import { toSnakeCase } from "../utils/toSnakeCase";
 
 /**
  * API resources for generating reports.
  */
 export class ReportsResource {
-  /**
-   * @param axios The Axios instance for making API requests.
-   */
   constructor(private readonly axios: AxiosInstance) {}
 
   /**
@@ -23,7 +20,7 @@ export class ReportsResource {
    * @see {@link https://web.timingapp.com/docs/#reports-GETapi-v1-report}
    */
   public async generate(query?: GenerateReportQuery): Promise<ReportRow[]> {
-    const response = await this.axios.get<ApiResponse<ReportRow[]>>('/report', {
+    const response = await this.axios.get<ApiResponse<ReportRow[]>>("/report", {
       params: query ? toSnakeCase(query) : undefined,
     });
     return response.data.data;

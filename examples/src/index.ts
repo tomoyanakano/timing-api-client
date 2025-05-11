@@ -31,6 +31,16 @@ const main = async () => {
     project: project.self,
   });
   console.log("Fetched time entries:", timeEntries);
+
+  // Generate a report for the project
+  const report = await client.reports.generate({
+    projects: [project.self],
+    startDateMin: "2023-01-01",
+    startDateMax: "2023-12-31",
+    columns: ["project", "title", "timespan"],
+  });
+
+  console.log("Generated report:", report);
 };
 
 main();

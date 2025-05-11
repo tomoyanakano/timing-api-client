@@ -42,32 +42,21 @@ describe("ProjectsResource", () => {
           self: "/projects/123",
           title: "Project 1",
           color: "#FF0000",
-          // Add other required Project fields if necessary, e.g., from Project type
-          title_chain: ["Project 1"],
-          productivity_score: 1,
-          is_archived: false,
-          notes: null,
           children: [],
-          parent: null,
           custom_fields: {},
-          team_id: null,
         },
         {
           self: "/projects/124",
           title: "Project 2",
           color: "#00FF00",
-          title_chain: ["Project 2"],
-          productivity_score: 1,
-          is_archived: false,
-          notes: null,
           children: [],
-          parent: null,
           custom_fields: {},
-          team_id: null,
         },
       ];
 
-      mockedAxios.get.mockResolvedValueOnce({ data: { data: expectedProjects } });
+      mockedAxios.get.mockResolvedValueOnce({
+        data: { data: expectedProjects },
+      });
 
       const result = await projects.list();
 
@@ -79,32 +68,30 @@ describe("ProjectsResource", () => {
     });
 
     test("should get filtered projects using valid query parameters", async () => {
-      const query: ListProjectsQuery = { // Use ListProjectsQuery type
+      const query: ListProjectsQuery = {
+        // Use ListProjectsQuery type
         title: "Sub Project", // Use a valid query param like 'title'
-        hideArchived: true,   // camelCase input
+        hideArchived: true, // camelCase input
       };
       const expectedProjects: Project[] = [
         {
           self: "/projects/123",
           title: "Sub Project 1",
           color: "#FF0000",
-          parent: null, // parent is part of Project type, not query for list
-          title_chain: ["Sub Project 1"],
-          productivity_score: 1,
-          is_archived: false,
-          notes: null,
           children: [],
           custom_fields: {},
-          team_id: null,
         },
       ];
 
-      mockedAxios.get.mockResolvedValueOnce({ data: { data: expectedProjects } });
+      mockedAxios.get.mockResolvedValueOnce({
+        data: { data: expectedProjects },
+      });
 
       const result = await projects.list(query);
 
       expect(mockedAxios.get).toHaveBeenCalledWith("/projects", {
-        params: { // Expect snake_case params
+        params: {
+          // Expect snake_case params
           title: "Sub Project",
           hide_archived: true,
         },
@@ -121,16 +108,12 @@ describe("ProjectsResource", () => {
         title: "Project 1",
         color: "#FF0000",
         notes: "Project notes",
-        children: [{ self: "/projects/456" }, { self: "/projects/457" }], // children are usually Project references
-        title_chain: ["Project 1"],
-        productivity_score: 1,
-        is_archived: false,
-        parent: null,
         custom_fields: {},
-        team_id: null,
       };
 
-      mockedAxios.get.mockResolvedValueOnce({ data: { data: expectedProject } });
+      mockedAxios.get.mockResolvedValueOnce({
+        data: { data: expectedProject },
+      });
 
       const result = await projects.get(id);
 
@@ -161,14 +144,18 @@ describe("ProjectsResource", () => {
         title: "New Project",
         color: "#0000FF",
         notes: "Project notes",
-        title_chain: ["New Project"], productivity_score: 1, is_archived: false, children: [], parent: null, custom_fields: {}, team_id: null,
+        children: [],
+        custom_fields: {},
       };
 
-      mockedAxios.post.mockResolvedValueOnce({ data: { data: expectedProject } });
+      mockedAxios.post.mockResolvedValueOnce({
+        data: { data: expectedProject },
+      });
 
       const result = await projects.create(options);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith("/projects", { // Expect snake_case
+      expect(mockedAxios.post).toHaveBeenCalledWith("/projects", {
+        // Expect snake_case
         title: "New Project",
         color: "#0000FF",
         notes: "Project notes",
@@ -184,15 +171,19 @@ describe("ProjectsResource", () => {
       const expectedProject: Project = {
         self: "/projects/456",
         title: "Sub Project",
-        parent: { self: "/projects/123" },
-        title_chain: ["Parent Project", "Sub Project"], productivity_score: 1, is_archived: false, children: [], color: "#FFFFFF", notes: null, custom_fields: {}, team_id: null,
+        children: [],
+        color: "#FFFFFF",
+        custom_fields: {},
       };
 
-      mockedAxios.post.mockResolvedValueOnce({ data: { data: expectedProject } });
+      mockedAxios.post.mockResolvedValueOnce({
+        data: { data: expectedProject },
+      });
 
       const result = await projects.create(options);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith("/projects", { // Expect snake_case (parent is already snake_case like)
+      expect(mockedAxios.post).toHaveBeenCalledWith("/projects", {
+        // Expect snake_case (parent is already snake_case like)
         title: "Sub Project",
         parent: "/projects/123",
       });
@@ -202,7 +193,8 @@ describe("ProjectsResource", () => {
     test("should handle custom fields", async () => {
       const options = {
         title: "Project with Custom Fields",
-        customFields: { // camelCase
+        customFields: {
+          // camelCase
           client_id: "123",
           department: "Engineering",
         },
@@ -214,14 +206,18 @@ describe("ProjectsResource", () => {
           client_id: "123",
           department: "Engineering",
         },
-        title_chain: ["Project with Custom Fields"], productivity_score: 1, is_archived: false, children: [], parent: null, color: "#FFFFFF", notes: null, team_id: null,
+        children: [],
+        color: "#FFFFFF",
       };
 
-      mockedAxios.post.mockResolvedValueOnce({ data: { data: expectedProject } });
+      mockedAxios.post.mockResolvedValueOnce({
+        data: { data: expectedProject },
+      });
 
       const result = await projects.create(options);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith("/projects", { // Expect snake_case
+      expect(mockedAxios.post).toHaveBeenCalledWith("/projects", {
+        // Expect snake_case
         title: "Project with Custom Fields",
         custom_fields: {
           client_id: "123",
@@ -237,21 +233,25 @@ describe("ProjectsResource", () => {
       const id = "123";
       const data = {
         title: "Updated Project", // camelCase (though title is often same)
-        notes: "Updated notes",   // camelCase
+        notes: "Updated notes", // camelCase
       };
       const expectedProject: Project = {
         self: "/projects/123",
         title: "Updated Project",
         notes: "Updated notes",
         color: "#FF0000",
-        title_chain: ["Updated Project"], productivity_score: 1, is_archived: false, children: [], parent: null, custom_fields: {}, team_id: null,
+        children: [],
+        custom_fields: {},
       };
 
-      mockedAxios.put.mockResolvedValueOnce({ data: { data: expectedProject } });
+      mockedAxios.put.mockResolvedValueOnce({
+        data: { data: expectedProject },
+      });
 
       const result = await projects.update(id, data);
 
-      expect(mockedAxios.put).toHaveBeenCalledWith(`/projects/${id}`, { // Expect snake_case
+      expect(mockedAxios.put).toHaveBeenCalledWith(`/projects/${id}`, {
+        // Expect snake_case
         title: "Updated Project",
         notes: "Updated notes",
       });
@@ -267,14 +267,18 @@ describe("ProjectsResource", () => {
         self: "/projects/123",
         title: "Project 1",
         color: "#00FF00",
-        title_chain: ["Project 1"], productivity_score: 1, is_archived: false, children: [], parent: null, notes: null, custom_fields: {}, team_id: null,
+        children: [],
+        custom_fields: {},
       };
 
-      mockedAxios.put.mockResolvedValueOnce({ data: { data: expectedProject } });
+      mockedAxios.put.mockResolvedValueOnce({
+        data: { data: expectedProject },
+      });
 
       const result = await projects.update(id, data);
 
-      expect(mockedAxios.put).toHaveBeenCalledWith(`/projects/${id}`, { // color is already snake_case like
+      expect(mockedAxios.put).toHaveBeenCalledWith(`/projects/${id}`, {
+        // color is already snake_case like
         color: "#00FF00",
       });
       expect(result).toEqual(expectedProject);

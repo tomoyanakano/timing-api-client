@@ -1,7 +1,6 @@
 import { AxiosInstance } from "axios";
 import { Project } from "../types/project";
 import { ApiResponse } from "../types/apiResponse";
-import { TimeEntry } from "../types/timeEntry";
 import { toSnakeCase } from "../utils/toSnakeCase";
 
 export interface CreateProjectOptions {
@@ -55,7 +54,7 @@ export interface ListProjectsQuery {
  * API resource for projects
  */
 export class ProjectsResource {
-  constructor(private readonly axios: AxiosInstance) { }
+  constructor(private readonly axios: AxiosInstance) {}
 
   /**
    * Get a list of projects
